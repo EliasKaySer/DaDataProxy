@@ -4,6 +4,7 @@ import org.springframework.http.*;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import service.proxy.dadata.model.transport.DaDataResponseDTO;
 import springfox.documentation.spring.web.json.Json;
 
 import java.util.Collections;
@@ -29,7 +30,7 @@ public class DaDataService implements DaDataInterface {
     }
 
     @Override
-    public final Map<String, String> Addresses(String query, Integer count, String language) {
+    public final DaDataResponseDTO getAddresses(String query, Integer count, String language) {
 // request url
         String url = this.baseUri + DADADA_API_ADDRESS;
 
@@ -53,21 +54,28 @@ public class DaDataService implements DaDataInterface {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(map, headers);
 
 // send POST request
-        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+        ResponseEntity<DaDataResponseDTO> response = restTemplate.postForEntity(url, request, DaDataResponseDTO.class);
 
-        Map<String, String> results = new HashMap<>();
+//        Map<String, Object> results = new HashMap<>();
+//
+//        results.put("StatusCode", response.getStatusCode().toString());
+//
+//// check response
+//        if (response.getStatusCode() == HttpStatus.OK) {
+//            results.put("Request", "Successful");
+//        } else {
+//            results.put("Request", "Failed");
+//        }
+//
+//        results.put("Body", response.getBody());ap<String, Object> results = new HashMap<>();
 
-        results.put("StatusCode", response.getStatusCode().toString());
+
 
 // check response
         if (response.getStatusCode() == HttpStatus.OK) {
-            results.put("Request", "Successful");
+            return response.getBody();
         } else {
-            results.put("Request", "Failed");
+            return new DaDataResponseDTO();
         }
-
-        results.put("Body", response.getBody().toString());
-
-        return results;
     }
 }

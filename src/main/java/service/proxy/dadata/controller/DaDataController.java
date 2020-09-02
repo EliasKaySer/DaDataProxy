@@ -3,9 +3,8 @@ package service.proxy.dadata.controller;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import service.proxy.dadata.model.transport.DaDataResponseDTO;
 import service.proxy.dadata.service.DaDataService;
-
-import java.util.*;
 
 @Api
 @ApiOperation(
@@ -30,54 +29,55 @@ public class DaDataController {
     private DaDataService service;
 
     @GetMapping("{query}")
-    private Map<String, String> getAddresses(
+    private DaDataResponseDTO getAddresses(
             @ApiParam(
                     value = "Текст запроса",
                     required = true,
                     defaultValue = "",
                     type = "String",
-                    example = "москва хабар"
+//                    example = "шлюзовая 19 630058"
+                    example = "Мусы Джа 9 630055"
             )
             @PathVariable
                     String query) {
 
 
-        return service.Addresses(query, 10, "ru");
+        return service.getAddresses(query, 10, "ru");
     }
 
-    @PostMapping
-    private Map<String, String> getAddresses(
-            @ApiParam(
-                    value = "Текст запроса",
-                    required = true,
-                    defaultValue = "",
-                    type = "String",
-                    example = "москва хабар"
-            )
-            @RequestBody
-                    String query,
-
-            @ApiParam(
-                    value = "Количество результатов (максимум — 20)",
-                    required = false,
-                    defaultValue = "10",
-                    type = "Integer",
-                    example = "10"
-            )
-            @RequestBody
-                    Integer count,
-
-            @ApiParam(
-                    value = "На каком языке вернуть результат (ru / en)",
-                    required = false,
-                    defaultValue = "ru",
-                    type = "String",
-                    example = "ru"
-            )
-            @RequestBody
-                    String language) {
-
-
-        return service.Addresses(query, count, language);
-    }
+//    @PostMapping
+//    private DaDataResponseDTO getAddresses(
+//            @ApiParam(
+//                    value = "Текст запроса",
+//                    required = true,
+//                    defaultValue = "",
+//                    type = "String",
+//                    example = "москва хабар"
+//            )
+//            @RequestBody
+//                    String query,
+//
+//            @ApiParam(
+//                    value = "Количество результатов (максимум — 20)",
+//                    required = false,
+//                    defaultValue = "10",
+//                    type = "Integer",
+//                    example = "10"
+//            )
+//            @RequestBody
+//                    Integer count,
+//
+//            @ApiParam(
+//                    value = "На каком языке вернуть результат (ru / en)",
+//                    required = false,
+//                    defaultValue = "ru",
+//                    type = "String",
+//                    example = "ru"
+//            )
+//            @RequestBody
+//                    String language) {
+//
+//
+//        return service.Addresses(query, count, language);
+//    }
 }
