@@ -5,6 +5,19 @@ swagger.host:
   localhost:${server.port}
 
 
+spring:
+  datasource:
+    url: jdbc:postgresql://192.168.0.182:5432/proxy_db?stringtype=unspecified
+    username: proxy
+    password: Uu6c34sDtnjfjC0ai1Lpm8gB
+  jpa:
+#    open-in-view: false
+#    properties.hibernate.jdbc.lob.non_contextual_creation: true
+#    hibernate.ddl-auto: validate
+#    show-sql: true
+    generate-ddl: true
+
+
 # dummy values to keep the placeholder substitution in tests happy
 dadata:
   api-key: 1cbdf85ba01c9eb14c325d82a0603b312e41e804
