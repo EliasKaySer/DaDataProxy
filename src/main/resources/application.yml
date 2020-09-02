@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+swagger.host:
+  localhost:${server.port}
+
+
+# dummy values to keep the placeholder substitution in tests happy
+dadata:
+  api-key: 1cbdf85ba01c9eb14c325d82a0603b312e41e804
+  secret-key: 5f85770575e3e11fe7658defbba3496c875a64bc
+  base-uri: https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest
