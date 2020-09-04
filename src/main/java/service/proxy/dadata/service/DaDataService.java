@@ -1,15 +1,20 @@
 package service.proxy.dadata.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import service.proxy.addresses.model.converter.AddressMaper;
+import service.proxy.addresses.model.entity.Address;
 import service.proxy.dadata.model.transport.DaDataResponseDTO;
-import springfox.documentation.spring.web.json.Json;
+import service.proxy.addresses.model.entity.Request;
+import service.proxy.addresses.repository.RequestRepository;
+import service.proxy.dadata.model.transport.clean.AddressCleanDTO;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DaDataService implements DaDataInterface {
 
@@ -29,8 +34,31 @@ public class DaDataService implements DaDataInterface {
         this.baseUri = StringUtils.hasText(baseUri) ? baseUri : DADATA_API_BASE_URI;
     }
 
+
+    @Autowired
+    private RequestRepository requestRepository;
+
+//    @Autowired
+//    private AddressMaper addressMaper;
+
+
     @Override
-    public final DaDataResponseDTO getAddresses(String query, Integer count, String language) {
+    public final List<AddressCleanDTO> getAddresses(String query, Integer count, String language) {
+
+// request body parameters
+        Map<String, Object> map = new HashMap<>();
+        map.put("query", query);
+        map.put("count", count);
+        map.put("language", language);
+
+        Request request = requestRepository.findByQuery(query);
+        if (request == null){
+            request = new Request(query);
+        } else {
+            request.IncCount();
+        }
+        request = requestRepository.save(request);
+
 // request url
         String url = this.baseUri + DADADA_API_ADDRESS;
 
@@ -44,38 +72,25 @@ public class DaDataService implements DaDataInterface {
         headers.set(HttpHeaders.AUTHORIZATION, "Token " + this.apiKey);
 //        headers.set("X-Secret", this.secretKey);
 
-// request body parameters
-        Map<String, Object> map = new HashMap<>();
-        map.put("query", query);
-        map.put("count", count);
-        map.put("language", language);
-
 // build the request
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(map, headers);
+        HttpEntity<Map<String, Object>> requestDaData = new HttpEntity<>(map, headers);
 
 // send POST request
-        ResponseEntity<DaDataResponseDTO> response = restTemplate.postForEntity(url, request, DaDataResponseDTO.class);
+        ResponseEntity<DaDataResponseDTO> responseDaData = restTemplate.postForEntity(url, requestDaData, DaDataResponseDTO.class);
 
-//        Map<String, Object> results = new HashMap<>();
-//
-//        results.put("StatusCode", response.getStatusCode().toString());
-//
-//// check response
-//        if (response.getStatusCode() == HttpStatus.OK) {
-//            results.put("Request", "Successful");
-//        } else {
-//            results.put("Request", "Failed");
-//        }
-//
-//        results.put("Body", response.getBody());ap<String, Object> results = new HashMap<>();
-
-
-
+        List<AddressCleanDTO> suggestions = new ArrayList<>();
 // check response
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody();
-        } else {
-            return new DaDataResponseDTO();
+        if (responseDaData.getStatusCode() == HttpStatus.OK) {
+            suggestions = responseDaData.getBody().getSuggestions();
+            Set<Address> collect = suggestions
+                    .stream()
+                    .map(a -> new Address(a))
+                    .collect(Collectors.toSet())
+                    ;
+            request.setResponseCount(collect.size());
+            request.setAddresses(collect);
+            request = requestRepository.save(request);
         }
+        return suggestions;
     }
 }

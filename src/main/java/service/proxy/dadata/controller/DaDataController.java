@@ -2,9 +2,16 @@ package service.proxy.dadata.controller;
 
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import service.proxy.addresses.model.entity.Address;
 import service.proxy.dadata.model.transport.DaDataResponseDTO;
+import service.proxy.dadata.model.transport.clean.AddressCleanDTO;
 import service.proxy.dadata.service.DaDataService;
+
+import java.util.List;
 
 @Api
 @ApiOperation(
@@ -29,7 +36,7 @@ public class DaDataController {
     private DaDataService service;
 
     @GetMapping("{query}")
-    private DaDataResponseDTO getAddresses(
+    private List<AddressCleanDTO> getAddresses(
             @ApiParam(
                     value = "Текст запроса",
                     required = true,
@@ -40,6 +47,8 @@ public class DaDataController {
             )
             @PathVariable
                     String query) {
+
+
 
 
         return service.getAddresses(query, 10, "ru");

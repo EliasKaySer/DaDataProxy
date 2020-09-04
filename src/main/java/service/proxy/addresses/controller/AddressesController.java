@@ -1,4 +1,4 @@
-package service.proxy.proxy.controller;
+package service.proxy.addresses.controller;
 
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,21 +6,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import service.proxy.proxy.model.entity.Address;
-import service.proxy.proxy.repository.ProxyRepository;
+import service.proxy.addresses.model.entity.Address;
+import service.proxy.addresses.repository.AddressRepository;
 
 @Api
 @RestController
 @RequestMapping("/api/v1/proxy")
-public class ProxyController {
+public class AddressesController {
 
     @Autowired
-    private ProxyRepository repository;
+    private AddressRepository addressRepository;
 
     @GetMapping(path = "/all")
     public @ResponseBody
     Iterable<Address> getAllAddress() {
-        return repository.findAll();
+        return addressRepository.findAll();
     }
 
 }
