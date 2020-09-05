@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.util.StringUtils;
 import service.proxy.models.transport.AddressDataDto;
 import service.proxy.models.transport.AddressDto;
 
@@ -12,16 +13,18 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@ApiModel
+@ApiModel(
+        value = "Адрес",
+        description = "Сущность Адрес")
 @Data
 @Entity
-//@Table(name = "Addresses")
-@Table(name = "Addresses",
-        indexes = {@Index(name = "addresses_content_uindex",
+@Table(name = "addresses",
+        indexes = {@Index(name = "addresses__postalcode_region_city_settlement_street_house__uindex",
                 columnList = "postalcode, region, city, settlement, street, house",
-                unique = true
-        )
-        })
+                unique = true),
+                @Index(name = "addresses__value__uindex",
+                        columnList = "value",
+                        unique = true)})
 public class Address {
     public Address() {
     }
@@ -59,24 +62,18 @@ public class Address {
     @Column(name = "house")
     private String house;
 
-//    TODO: set this.value is unique
     @ApiModelProperty(value = "Адрес одной строкой (как показывается в списке подсказок)")
-    @Column(name = "value", unique = false)
+    @Column(name = "value", unique = true)
     private String value;
 
+    @ApiModelProperty(value = "Связанные ответы")
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "cross_requests_addresses",
             joinColumns = @JoinColumn(name = "requests_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "addresses_id", referencedColumnName = "id"))
     private Set<Request> requests = new HashSet<>();
 
-//    @EmbeddedId
-//    private AddressId addressId;
-
     public Address(AddressDto dto) {
-
-//        this.addressId = new AddressId(dto.getData());
-
         AddressDataDto data = dto.getData();
         this.postalcode = data.getPostal_code();
         this.region = data.getRegion();
@@ -85,12 +82,21 @@ public class Address {
         this.street = data.getStreet();
         this.house = data.getHouse();
 
-        this.value = dto.getValue();
-//        this.value = (StringUtils.hasText(this.postalcode) ? this.postalcode : "")
-//                + (StringUtils.hasText(this.region) ? String.format(", %s", this.region) : "")
-//                + (StringUtils.hasText(this.city) ? String.format(", г %s", this.city) : "")
-//                + (StringUtils.hasText(this.settlement) ? String.format(", %s", this.settlement) : "")
-//                + (StringUtils.hasText(this.street) ? String.format(", ул %s", this.street) : "")
-//                + (StringUtils.hasText(this.house) ? String.format(", д %s", this.house) : "");
+        this.value = (StringUtils.hasText(this.postalcode) ? this.postalcode : "")
+                + (StringUtils.hasText(this.region) ? String.format(", %s", this.region) : "")
+                + (StringUtils.hasText(this.city) ? String.format(", г %s", this.city) : "")
+                + (StringUtils.hasText(this.settlement) ? String.format(", %s", this.settlement) : "")
+                + (StringUtils.hasText(this.street) ? String.format(", ул %s", this.street) : "")
+                + (StringUtils.hasText(this.house) ? String.format(", д %s", this.house) : "");
+
+    }
+
+    public void setData(Address data) {
+        this.postalcode = data.getPostalcode();
+        this.region = data.getRegion();
+        this.city = data.getCity();
+        this.settlement = data.getSettlement();
+        this.street = data.getStreet();
+        this.house = data.getHouse();
     }
 }

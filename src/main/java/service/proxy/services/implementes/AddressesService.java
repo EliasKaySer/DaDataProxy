@@ -7,9 +7,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import service.proxy.models.entity.Address;
 import service.proxy.models.entity.Request;
-import service.proxy.models.transport.AddressDto;
 import service.proxy.models.transport.AddressListDto;
-import service.proxy.models.transport.AddressSuggestionDto;
 import service.proxy.repositories.AddressRepository;
 import service.proxy.repositories.RequestRepository;
 import service.proxy.services.interfaces.AddressInterface;
@@ -53,7 +51,7 @@ public class AddressesService implements AddressInterface {
 
     @Override
     public final List<String> getAddresses(String query, Integer count, String language) {
-        if (StringUtils.isEmpty(query)){
+        if (StringUtils.isEmpty(query)) {
             return new ArrayList<>();
         }
 
@@ -61,29 +59,28 @@ public class AddressesService implements AddressInterface {
         if (request == null) {
             request = new Request(query);
             Set<Address> addresses = doRequest(query, count, language).getSuggestions()
-                    .stream().map(a -> new Address(a)).collect(Collectors.toSet());
-//            Set<Address> entityes = addresses.stream()
-//                    .map(a -> addressRepository.findByValue(a.getValue())).collect(Collectors.toSet());
-//            addresses.removeIf(a -> entityes.stream().map(e -> e.getValue()).collect(Collectors.toSet()).contains(a.getValue()));
-//            addresses.addAll(entityes);
-//            TODO: after set Address.value is unique add to cross_table entity id
-            request.setAddresses(addresses);
-            request.setResponses(request.getAddresses().size());
+                    .stream().map(Address::new).collect(Collectors.toSet());
+            Set<Address> entityes = addresses.stream().map(a -> addressRepository.findByValue(a.getValue()))
+                    .collect(Collectors.toSet());
+            request.setAddresses(addresses, entityes);
 
         } else {
+            request.setDate(new Date().getTime());
             request.IncCount();
+//            TODO: test
+//        if (((new Date()).getTime() - request.getDate()) / (60 * 1000) % 60 > 1) {
             if (((new Date()).getTime() - request.getDate()) / (60 * 60 * 1000) % 24 > 3) {
-                request.setAddresses(doRequest(query, count, language).getSuggestions()
-                        .stream().map(a -> new Address(a)).collect(Collectors.toSet()));
-                request.setResponses(request.getAddresses().size());
+                Set<Address> addresses = doRequest(query, count, language).getSuggestions()
+                        .stream().map(Address::new).collect(Collectors.toSet());
+                Set<Address> entityes = addresses.stream().map(a -> addressRepository.findByValue(a.getValue()))
+                        .collect(Collectors.toSet());
+                request.setAddresses(addresses, entityes);
             }
         }
+        request.setResponses(request.getAddresses().size());
         request = requestRepository.save(request);
         return request.getAddresses().stream()
-                .map(a -> a.getValue()).collect(Collectors.toList());
-//        return request.getAddresses()
-//                .stream().map(a -> new AddressDto(a))
-//                .map(a -> a.getValue()).collect(Collectors.toList());
+                .map(Address::getValue).collect(Collectors.toList());
     }
 
     @Override
@@ -105,6 +102,7 @@ public class AddressesService implements AddressInterface {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.set(HttpHeaders.AUTHORIZATION, "Token " + this.apiKey);
+//        TODO: Api standart
 //        headers.set("X-Secret", this.secretKey);
 
         // build the request
@@ -124,7 +122,6 @@ public class AddressesService implements AddressInterface {
     @Autowired
     private RequestRepository requestRepository;
 
-    @Override
     public Iterable<Request> getAllRequest() {
         return requestRepository.findAll();
     }
@@ -132,6 +129,8 @@ public class AddressesService implements AddressInterface {
     public Iterable<Request> getCleanedRequests() {
         //calculate date
         Calendar cal = Calendar.getInstance();
+//        TODO: test
+//        cal.add(Calendar.MINUTE, -1);
         cal.add(Calendar.MONTH, -1);
 
         Iterable<Request> requests = requestRepository

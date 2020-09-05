@@ -24,7 +24,7 @@ public class RequestsController {
 
     @ApiOperation(
             value = "Удалить не нужные уставшие запросы",
-            notes = "Возвращается список запросов из БД"
+            notes = "Возвращается список запросов которые были удалены из БД"
     )
     @RequestMapping(value = "/clean", method = RequestMethod.GET)
     public @ResponseBody

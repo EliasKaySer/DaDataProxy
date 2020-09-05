@@ -7,7 +7,6 @@ import service.proxy.models.entity.Request;
 import service.proxy.repositories.RequestRepository;
 
 import java.util.Calendar;
-import java.util.Date;
 
 @Component
 public class AddressesJob {
@@ -20,9 +19,9 @@ public class AddressesJob {
         //calculate date
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MONTH, -1);
-        Long previous = cal.getTime().getTime();
 
-        Iterable<Request> requests = requestRepository.findByDateLessThanEqualAndResponsesLessThan(previous, 3);
+        Iterable<Request> requests = requestRepository
+                .findByDateLessThanEqualAndResponsesLessThan(cal.getTime().getTime(), 3);
         requestRepository.deleteAll(requests);
     }
 }

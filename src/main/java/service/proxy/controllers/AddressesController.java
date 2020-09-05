@@ -4,9 +4,6 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import service.proxy.models.entity.Address;
-import service.proxy.models.entity.Request;
-import service.proxy.models.transport.AddressDto;
-import service.proxy.models.transport.AddressSuggestionDto;
 import service.proxy.services.implementes.AddressesService;
 
 import java.util.List;
@@ -44,7 +41,8 @@ public class AddressesController {
             @ApiResponse(code = 500, message = "Произошла внутренняя ошибка сервиса"),
     })
     @RequestMapping(value = "/{query}", method = RequestMethod.GET)
-    private @ResponseBody List<String> getAddresses(
+    private @ResponseBody
+    List<String> getAddresses(
             @ApiParam(value = "Текст запроса", required = true, defaultValue = "", type = "String",
                     example = "Мусы Джа 9 630055") @PathVariable String query
     ) {
@@ -66,7 +64,8 @@ public class AddressesController {
             @ApiResponse(code = 500, message = "Произошла внутренняя ошибка сервиса"),
     })
     @RequestMapping(value = "", method = RequestMethod.POST)
-    private @ResponseBody List<String> getAddresses(
+    private @ResponseBody
+    List<String> getAddresses(
             @ApiParam(value = "Текст запроса", required = true, defaultValue = "", type = "String",
                     example = "москва хабар") @RequestParam String query,
             @ApiParam(value = "Количество результатов (максимум — 20)", required = false, defaultValue = "10", type = "Integer",
