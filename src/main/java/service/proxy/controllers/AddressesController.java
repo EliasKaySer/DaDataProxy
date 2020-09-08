@@ -3,7 +3,7 @@ package service.proxy.controllers;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import service.proxy.models.entity.Address;
+import service.proxy.models.transports.AddressDto;
 import service.proxy.services.implementes.AddressesService;
 
 import java.util.List;
@@ -22,8 +22,26 @@ public class AddressesController {
     )
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public @ResponseBody
-    Iterable<Address> getAllAddress() {
-        return addressesService.getAllAddress();
+    List<AddressDto> getAllAddresses() {
+        return addressesService.getAllAddresses();
+    }
+
+    @ApiOperation(
+            value = "Поиск адресов",
+            notes = "Возвращается список адресов из БД"
+    )
+    @RequestMapping(value = "/find", method = RequestMethod.POST)
+    private @ResponseBody
+    List<AddressDto> getAddresses(
+            @ApiParam(value = "Регион", defaultValue = "", type = "String",
+                    example = "") @RequestParam(required = false) String region,
+            @ApiParam(value = "Город", defaultValue = "", type = "String",
+                    example = "") @RequestParam(required = false) String city,
+            @ApiParam(value = "Поселок", defaultValue = "", type = "String",
+                    example = "") @RequestParam(required = false) String settlement,
+            @ApiParam(value = "Улица", defaultValue = "", type = "String",
+                    example = "") @RequestParam(required = false) String street) {
+        return addressesService.getAddresses(region, city, settlement, street);
     }
 
     @ApiOperation(
@@ -42,11 +60,11 @@ public class AddressesController {
     })
     @RequestMapping(value = "/{query}", method = RequestMethod.GET)
     private @ResponseBody
-    List<String> getAddresses(
-            @ApiParam(value = "Текст запроса", required = true, defaultValue = "", type = "String",
-                    example = "Мусы Джа 9 630055") @PathVariable String query
+    List<String> getSuggestions(
+            @ApiParam(value = "Текст запроса", defaultValue = "", type = "String",
+                    example = "630058 Новосибирск Вахтангова 5") @PathVariable(required = true) String query
     ) {
-        return addressesService.getAddresses(query, 10, "ru");
+        return addressesService.getSuggestions(query, 10, "ru");
     }
 
     @ApiOperation(
@@ -65,13 +83,13 @@ public class AddressesController {
     })
     @RequestMapping(value = "", method = RequestMethod.POST)
     private @ResponseBody
-    List<String> getAddresses(
-            @ApiParam(value = "Текст запроса", required = true, defaultValue = "", type = "String",
-                    example = "москва хабар") @RequestParam String query,
-            @ApiParam(value = "Количество результатов (максимум — 20)", required = false, defaultValue = "10", type = "Integer",
-                    example = "10") @RequestParam Integer count,
-            @ApiParam(value = "На каком языке вернуть результат (ru / en)", required = false, defaultValue = "ru", type = "String",
-                    example = "ru") @RequestParam String language) {
-        return addressesService.getAddresses(query, count, language);
+    List<String> getSuggestions(
+            @ApiParam(value = "Текст запроса", defaultValue = "", type = "String",
+                    example = "630058 Новосибирск Вахтангова 5") @RequestParam(required = true) String query,
+            @ApiParam(value = "Количество результатов (максимум — 20)", defaultValue = "10", type = "Integer",
+                    example = "10") @RequestParam(required = false, defaultValue = "10") Integer count,
+            @ApiParam(value = "На каком языке вернуть результат (ru / en)", defaultValue = "ru", type = "String",
+                    example = "ru") @RequestParam(required = false, defaultValue = "ru") String language) {
+        return addressesService.getSuggestions(query, count, language);
     }
 }

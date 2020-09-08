@@ -1,4 +1,4 @@
-package service.proxy.models.transport;
+package service.proxy.models.transports;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

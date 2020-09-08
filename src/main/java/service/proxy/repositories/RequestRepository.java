@@ -1,15 +1,17 @@
 package service.proxy.repositories;
 
 import org.springframework.data.repository.CrudRepository;
-import service.proxy.models.entity.Request;
+import org.springframework.stereotype.Repository;
+import service.proxy.models.entityes.Request;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+@Repository
 public interface RequestRepository extends CrudRepository<Request, UUID> {
 
-    Request findByQuery(String query);
+    Optional<Request> findByQuery(String query);
 
-    Iterable<Request> findByDateLessThanEqualAndResponsesLessThan(Long previous, int count);
+    Set<Request> findByDateLessThanEqualAndResponsesLessThan(long previous, int count);
 }

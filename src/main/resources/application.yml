@@ -11,11 +11,11 @@ spring:
     username: proxy
     password: Uu6c34sDtnjfjC0ai1Lpm8gB
   jpa:
-#    open-in-view: false
-#    properties.hibernate.jdbc.lob.non_contextual_creation: true
-#    hibernate.ddl-auto: validate
-#    show-sql: true
     generate-ddl: true
+    open-in-view: false
+    properties.hibernate.jdbc.lob.non_contextual_creation: true
+    show-sql: true
+#    hibernate.ddl-auto: validate
 
 
 # dummy values to keep the placeholder substitution in tests happy
@@ -23,3 +23,8 @@ dadata:
   api-key: 1cbdf85ba01c9eb14c325d82a0603b312e41e804
   secret-key: 5f85770575e3e11fe7658defbba3496c875a64bc
   base-uri: https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest
+  uri-address: /address
+  language-default: ru
+  suggest-count-min: 1
+  suggest-count-default: 10
+  suggest-count-max: 20
