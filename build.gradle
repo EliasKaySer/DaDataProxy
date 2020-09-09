@@ -57,6 +57,7 @@ compileJava {
 dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
     annotationProcessor "org.projectlombok:lombok"
+//    implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.mapstruct:mapstruct:$mapstructVersion"
@@ -66,9 +67,11 @@ dependencies {
     implementation "org.projectlombok:lombok"
     implementation "org.postgresql:postgresql"
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+//    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+//        exclude group: "org.junit.vintage", module: "junit-vintage-engine"
+//    }
 }
 
 test {

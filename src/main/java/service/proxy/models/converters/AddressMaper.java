@@ -15,7 +15,9 @@ public abstract class AddressMaper {
     public abstract AddressDataDto toDto (Address entity);
 
     @Mappings({
-            @Mapping(source = "postal_code", target = "postalcode")
+            @Mapping(source = "postal_code", target = "postalcode"),
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "requests", ignore = true)
     })
     public abstract Address toEntity (AddressDataDto dto);
 
