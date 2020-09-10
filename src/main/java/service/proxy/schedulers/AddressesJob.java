@@ -23,7 +23,7 @@ public class AddressesJob {
     @Autowired
     private AddressRepository addressRepository;
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 22 * * ?")
     @Transactional
     public void cleaner() {
         //calculate date

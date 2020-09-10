@@ -20,7 +20,7 @@ public class AddressesController {
             value = "Все адреса",
             notes = "Возвращается список адресов из БД"
     )
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
     List<AddressDto> getAllAddresses() {
         return addressesService.getAllAddresses();
@@ -81,7 +81,7 @@ public class AddressesController {
             @ApiResponse(code = 429, message = "Слишком много запросов в секунду или новых соединений в минуту"),
             @ApiResponse(code = 500, message = "Произошла внутренняя ошибка сервиса"),
     })
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/", method = RequestMethod.POST)
     private @ResponseBody
     List<String> getSuggestions(
             @ApiParam(value = "Текст запроса", defaultValue = "", type = "String",

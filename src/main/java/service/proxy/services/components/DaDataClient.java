@@ -16,21 +16,21 @@ import java.util.stream.Collectors;
 
 @Component
 public class DaDataClient {
-    @Value("${dadata.api-key}")
+    @Value("${dadata.apiKey}")
     private String apiKey;
-    @Value("${dadata.secret-key}")
+    @Value("${dadata.secretKey}")
     private String secretKey;
-    @Value("${dadata.base-uri}")
+    @Value("${dadata.baseUri}")
     private String baseUri;
-    @Value("${dadata.uri-address}")
+    @Value("${dadata.uriAddress}")
     private String uriAddress;
-    @Value("${dadata.language-default}")
+    @Value("${dadata.languageDefault}")
     private String languageDefault;
-    @Value("${dadata.suggest-count-min}")
+    @Value("${dadata.suggestCountMin}")
     private Integer suggestCountMin;
-    @Value("${dadata.suggest-count-default}")
+    @Value("${dadata.suggestCountDefault}")
     private Integer suggestCountDefault;
-    @Value("${dadata.suggest-count-max}")
+    @Value("${dadata.suggestCountMax}")
     private Integer suggestCountMax;
 
     public List<AddressDataDto> getAddresses(String query, Integer count, String language) {

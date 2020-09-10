@@ -16,19 +16,22 @@ import java.util.UUID;
         description = "Сущность Адрес")
 @Data
 @Entity
-@Table(name = "addresses",
-        indexes = @Index(name = "addresses__postalcode_region_city_settlement_street_house__uindex",
-                columnList = "postalcode, region, city, settlement, street, house",
-                unique = true))
+@Table(name = "addresses")
+//@Table(name = "addresses",
+//        indexes = @Index(name = "addresses__postalcode_region_city_settlement_street_house__uindex",
+//                columnList = "postalcode, region, city, settlement, street, house",
+//                unique = true))
 @ToString(exclude = "requests")
 public class Address {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", updatable = false, unique = true, nullable = false)
+//    @GeneratedValue(generator = "UUID")
+//    @GenericGenerator(
+//            name = "UUID",
+//            strategy = "org.hibernate.id.UUIDGenerator"
+//    )
+//    @Column(name = "id", updatable = false, unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private UUID id;
 
     @ApiModelProperty(value = "Индекс")

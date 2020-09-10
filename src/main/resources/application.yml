@@ -4,27 +4,37 @@ server:
 swagger.host:
   localhost:${server.port}
 
-
 spring:
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://192.168.0.182:5432/proxy_db?stringtype=unspecified
     username: proxy
     password: Uu6c34sDtnjfjC0ai1Lpm8gB
   jpa:
-    generate-ddl: true
+#    generate-ddl: true
     open-in-view: false
     properties.hibernate.jdbc.lob.non_contextual_creation: true
     show-sql: true
-#    hibernate.ddl-auto: validate
-
+  #    hibernate.ddl-auto: validate
+  flyway:
+    enabled: true
+    validateOnMigrate: true
+    createSchemas: false
+    url: jdbc:postgresql://192.168.0.182:5432/proxy_db
+    schemas: proxy
+    user: proxy
+    password: Uu6c34sDtnjfjC0ai1Lpm8gB
+    locations:
+      classpath:db/migrations
+    baselineOnMigrate: false
 
 # dummy values to keep the placeholder substitution in tests happy
 dadata:
-  api-key: 1cbdf85ba01c9eb14c325d82a0603b312e41e804
-  secret-key: 5f85770575e3e11fe7658defbba3496c875a64bc
-  base-uri: https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest
-  uri-address: /address
-  language-default: ru
-  suggest-count-min: 1
-  suggest-count-default: 10
-  suggest-count-max: 20
+  apiKey: 1cbdf85ba01c9eb14c325d82a0603b312e41e804
+  secretKey: 5f85770575e3e11fe7658defbba3496c875a64bc
+  baseUri: https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest
+  uriAddress: /address
+  languageDefault: ru
+  suggestCountMin: 1
+  suggestCountDefault: 10
+  suggestCountMax: 20
