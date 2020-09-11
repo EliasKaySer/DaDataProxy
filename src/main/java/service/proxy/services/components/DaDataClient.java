@@ -22,16 +22,12 @@ public class DaDataClient {
     private String secretKey;
     @Value("${dadata.baseUri}")
     private String baseUri;
-    @Value("${dadata.uriAddress}")
-    private String uriAddress;
-    @Value("${dadata.languageDefault}")
-    private String languageDefault;
-    @Value("${dadata.suggestCountMin}")
-    private Integer suggestCountMin;
-    @Value("${dadata.suggestCountDefault}")
-    private Integer suggestCountDefault;
-    @Value("${dadata.suggestCountMax}")
-    private Integer suggestCountMax;
+    private static final String DADATA_SUGGEST_BASE_URI = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest";
+    private static final String DADATA_ADDRESS_URI = "/address";
+    private static final String SUGGEST_LANGUAGE_DEFAULT = "ru";
+    private static final Integer SUGGEST_COUNT_MIN = 1;
+    private static final Integer SUGGEST_COUNT_DEFAULT = 10;
+    private static final Integer SUGGEST_COUNT_MAX = 20;
 
     public List<AddressDataDto> getAddresses(String query, Integer count, String language) {
         return doRequest(query, count, language)
@@ -43,13 +39,13 @@ public class DaDataClient {
 
     public AddressListDto doRequest(String query, Integer count, String language) {
         // request url
-        String url = this.baseUri + uriAddress;
+        String url = (StringUtils.hasText(this.baseUri) ? this.baseUri : DADATA_SUGGEST_BASE_URI) + DADATA_ADDRESS_URI;
         // request body parameters
         Map<String, Object> map = new HashMap<>();
         map.put("query", query);
-        map.put("count", (count == null || count < suggestCountMin)
-                ? suggestCountDefault : (count > suggestCountMax) ? suggestCountMax : count);
-        map.put("language", StringUtils.hasText(language) ? language : languageDefault);
+        map.put("count", (count == null || count < SUGGEST_COUNT_MIN)
+                ? SUGGEST_COUNT_DEFAULT : (count > SUGGEST_COUNT_MAX) ? SUGGEST_COUNT_MAX : count);
+        map.put("language", StringUtils.hasText(language) ? language : SUGGEST_LANGUAGE_DEFAULT);
         // create an instance of RestTemplate
         RestTemplate restTemplate = new RestTemplate();
         // create headers
@@ -60,10 +56,10 @@ public class DaDataClient {
 //        TODO: Api standart
 //        headers.set("X-Secret", this.secretKey);
         // build the request
-        HttpEntity<Map<String, Object>> requestDaData = new HttpEntity<>(map, headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(map, headers);
         // send POST request
         ResponseEntity<AddressListDto> responseDaData = restTemplate
-                .postForEntity(url, requestDaData, AddressListDto.class);
+                .postForEntity(url, request, AddressListDto.class);
         // check response
         if (responseDaData.getStatusCode() == HttpStatus.OK) {
             return responseDaData.getBody();

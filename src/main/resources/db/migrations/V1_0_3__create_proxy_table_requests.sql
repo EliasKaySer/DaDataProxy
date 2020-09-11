@@ -4,7 +4,8 @@ create table requests
         constraint requests_pkey
             primary key,
     count     integer      not null,
-    date      bigint       not null,
+    date      timestamp with time zone
+        not null,
     query     varchar(255) not null
         constraint requests_query_uk
             unique,

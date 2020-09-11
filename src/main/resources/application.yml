@@ -1,9 +1,6 @@
 server:
   port: 8080
 
-swagger.host:
-  localhost:${server.port}
-
 spring:
   datasource:
     driverClassName: org.postgresql.Driver
@@ -11,11 +8,10 @@ spring:
     username: proxy
     password: Uu6c34sDtnjfjC0ai1Lpm8gB
   jpa:
-#    generate-ddl: true
     open-in-view: false
     properties.hibernate.jdbc.lob.non_contextual_creation: true
     show-sql: true
-  #    hibernate.ddl-auto: validate
+    hibernate.ddl-auto: validate
   flyway:
     enabled: true
     validateOnMigrate: true
@@ -28,13 +24,24 @@ spring:
       classpath:db/migrations
     baselineOnMigrate: false
 
+swagger.host:
+  localhost:${server.port}
+
 # dummy values to keep the placeholder substitution in tests happy
 dadata:
   apiKey: 1cbdf85ba01c9eb14c325d82a0603b312e41e804
   secretKey: 5f85770575e3e11fe7658defbba3496c875a64bc
   baseUri: https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest
-  uriAddress: /address
-  languageDefault: ru
-  suggestCountMin: 1
-  suggestCountDefault: 10
-  suggestCountMax: 20
+
+requests:
+  obsolete:
+    hours: 3
+    minutes: 0
+    seconds: 0
+  removal:
+    cron: 0 0 22 * * ?
+    responses: 0
+    month: 0
+    hours: 0
+    minutes: 0
+    seconds: 0

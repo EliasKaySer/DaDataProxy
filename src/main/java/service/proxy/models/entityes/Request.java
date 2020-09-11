@@ -4,11 +4,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.ToString;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,10 +46,12 @@ public class Request {
     @ApiModelProperty(value = "Дата вызова вопроса")
 //    @Column(name = "date", nullable = false)
     @Column(name = "date")
-    private Long date = new Date().getTime();
+    private Instant date = Instant.now();
+//    private Long date = new Date().getTime();
 
     @ApiModelProperty(value = "Связанные адреса")
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "requests_addresses",
             joinColumns = @JoinColumn(name = "request_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "address_id", referencedColumnName = "id"))
@@ -61,11 +62,5 @@ public class Request {
 
     public Request(String query) {
         this.query = query;
-    }
-
-    public void incremetRequest() {
-        this.count++;
-        this.date = new Date().getTime();
-        this.responses = this.addresses.size();
     }
 }

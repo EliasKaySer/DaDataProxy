@@ -2,15 +2,13 @@ package service.proxy.services.components;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import service.proxy.models.entityes.Address;
 import service.proxy.models.entityes.Request;
 import service.proxy.repositories.AddressRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,7 +17,7 @@ public class AddressesUtils {
 
     private final AddressRepository addressRepository;
 
-    public String getValueByContent(Address address) {
+    public String getAddressValue(Address address) {
         String value = StringUtils.hasText(address.getPostalcode()) ? address.getPostalcode() : "";
         value += StringUtils.hasText(address.getRegion())
                 ? (String.format("%s%s", StringUtils.hasText(value) ? ", " : "", address.getRegion()))
@@ -39,10 +37,17 @@ public class AddressesUtils {
         return value;
     }
 
+    public List<String> getAddressesAsStingList(List<Address> addresses) {
+        return addresses
+                .stream()
+                .map(this::getAddressValue)
+                .collect(Collectors.toList());
+    }
+
     public List<Address> getAddresses(String region, String city, String settlement, String street) {
         List<Address> entityes = new ArrayList<>();
 
-        if (StringUtils.isEmpty(region)) {
+        if (StringUtils.hasText(region)) {
             entityes = addressRepository.findAllByRegionLikeIgnoreCase(region);
         }
 
@@ -75,6 +80,12 @@ public class AddressesUtils {
         return entityes;
     }
 
+    public List<Address> getAddresses(Address address) {
+        return addressRepository.findByPostalcodeAndRegionAndCityAndSettlementAndStreetAndHouse(
+                address.getPostalcode(), address.getRegion(), address.getCity(),
+                address.getSettlement(), address.getStreet(), address.getHouse());
+    }
+
     public boolean equalsAddresses(Address address, Address persistAddress) {
         int addressHashCode = (address.getPostalcode() != null ? address.getPostalcode().hashCode() : 0)
                 + (address.getRegion() != null ? address.getRegion().hashCode() : 0)
@@ -91,11 +102,10 @@ public class AddressesUtils {
         return addressHashCode == persistAddressHashCode;
     }
 
+    @Transactional
     public List<Address> getUpdatedRelatedAddressesList(Request request, List<Address> addresses) {
         List<Address> persistedAddresses = addresses.stream()
-                .map(address -> addressRepository.findByPostalcodeAndRegionAndCityAndSettlementAndStreetAndHouse(
-                        address.getPostalcode(), address.getRegion(), address.getCity(),
-                        address.getSettlement(), address.getStreet(), address.getHouse()))
+                .map(this::getAddresses)
                 .flatMap(Collection::stream)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -122,4 +132,13 @@ public class AddressesUtils {
         return addresses;
     }
 
+    public void removeObsoleteAddresses(List<UUID> requestsIds, List<Address> addresses) {
+        for (Address address : addresses) {
+            if (address.getRequests().stream()
+                    .filter(a -> !requestsIds.contains(a.getId()))
+                    .collect(Collectors.toList()).size() == 0) {
+                addressRepository.delete(address);
+            }
+        }
+    }
 }

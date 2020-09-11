@@ -1,44 +1,31 @@
 package service.proxy.schedulers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import service.proxy.models.entityes.Address;
-import service.proxy.models.entityes.Request;
-import service.proxy.repositories.AddressRepository;
-import service.proxy.repositories.RequestRepository;
-
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
+import service.proxy.services.components.RequestsUtils;
 
 @Component
+@RequiredArgsConstructor
 public class AddressesJob {
+    @Value("${requests.removal.responses}")
+    private int responses;
+    @Value("${requests.removal.month}")
+    private int month;
+    @Value("${requests.removal.hours}")
+    private int hours;
+    @Value("${requests.removal.minutes}")
+    private int minutes;
+    @Value("${requests.removal.seconds}")
+    private int seconds;
 
-    @Autowired
-    private RequestRepository requestRepository;
+    private final RequestsUtils requestsUtils;
 
-    @Autowired
-    private AddressRepository addressRepository;
-
-    @Scheduled(cron = "0 0 22 * * ?")
+    @Scheduled(cron = "${requests.removal.cron}")
     @Transactional
     public void cleaner() {
-        //calculate date
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MONTH, -1);
-
-        Set<Request> requests = requestRepository
-                .findByDateLessThanEqualAndResponsesLessThan(cal.getTime().getTime(), 3);
-        if (requests.size() > 0) {
-            Set<Address> addresses = requests.stream().map(Request::getAddresses)
-                    .flatMap(Collection::stream).collect(Collectors.toSet());
-            requestRepository.deleteAll(requests);
-            addressRepository.deleteAll(addresses.stream()
-                    .filter(a -> a.getRequests().size() == 0).collect(Collectors.toList()));
-        }
-        requestRepository.deleteAll(requests);
+        requestsUtils.RemoveObsoleteRequests(responses, month, hours, minutes, seconds);
     }
 }
