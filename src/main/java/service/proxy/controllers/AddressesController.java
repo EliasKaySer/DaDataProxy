@@ -1,20 +1,33 @@
 package service.proxy.controllers;
 
 import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import service.proxy.models.converters.AddressMaper;
 import service.proxy.models.transports.AddressDto;
 import service.proxy.services.implementes.AddressesService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api
 @RestController
 @RequestMapping("/api/v1/address")
+@RequiredArgsConstructor
 public class AddressesController {
 
-    @Autowired
-    private AddressesService addressesService;
+    private final AddressesService addressesService;
+
+    private final AddressMaper addressMaper;
+
+    @ApiOperation(
+            value = "Очистка данных",
+            notes = "Очистка данных от устаревших запросов"
+    )
+    @RequestMapping(value = "/clean", method = RequestMethod.GET)
+    public void clean() {
+        addressesService.clean();
+    }
 
     @ApiOperation(
             value = "Все адреса",
@@ -23,7 +36,10 @@ public class AddressesController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
     List<AddressDto> getAllAddresses() {
-        return addressesService.getAllAddresses();
+        return addressesService.getAllAddresses()
+                .stream()
+                .map(addressMaper::toDto)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation(
@@ -41,7 +57,10 @@ public class AddressesController {
                     example = "") @RequestParam(required = false) String settlement,
             @ApiParam(value = "Улица", defaultValue = "", type = "String",
                     example = "") @RequestParam(required = false) String street) {
-        return addressesService.getAddresses(region, city, settlement, street);
+        return addressesService.getAddresses(region, city, settlement, street)
+                .stream()
+                .map(addressMaper::toDto)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation(
@@ -64,7 +83,10 @@ public class AddressesController {
             @ApiParam(value = "Текст запроса", defaultValue = "", type = "String",
                     example = "630058 Новосибирск Вахтангова 5") @PathVariable(required = true) String query
     ) {
-        return addressesService.getSuggestions(query, 10, "ru");
+        return addressesService.getSuggestions(query, 10, "ru").stream()
+                .map(addressMaper::toDto)
+                .map(AddressDto::getValue)
+                .collect(Collectors.toList());
     }
 
     @ApiOperation(
@@ -90,6 +112,9 @@ public class AddressesController {
                     example = "10") @RequestParam(required = false, defaultValue = "10") Integer count,
             @ApiParam(value = "На каком языке вернуть результат (ru / en)", defaultValue = "ru", type = "String",
                     example = "ru") @RequestParam(required = false, defaultValue = "ru") String language) {
-        return addressesService.getSuggestions(query, count, language);
+        return addressesService.getSuggestions(query, count, language).stream()
+                .map(addressMaper::toDto)
+                .map(AddressDto::getValue)
+                .collect(Collectors.toList());
     }
 }

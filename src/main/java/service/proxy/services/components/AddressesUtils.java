@@ -17,31 +17,8 @@ public class AddressesUtils {
 
     private final AddressRepository addressRepository;
 
-    public String getAddressValue(Address address) {
-        String value = StringUtils.hasText(address.getPostalcode()) ? address.getPostalcode() : "";
-        value += StringUtils.hasText(address.getRegion())
-                ? (String.format("%s%s", StringUtils.hasText(value) ? ", " : "", address.getRegion()))
-                : "";
-        value += StringUtils.hasText(address.getCity())
-                ? (String.format("%sг %s", StringUtils.hasText(value) ? ", " : "", address.getCity()))
-                : "";
-        value += StringUtils.hasText(address.getSettlement())
-                ? (String.format("%s%s", StringUtils.hasText(value) ? ", " : "", address.getSettlement()))
-                : "";
-        value += StringUtils.hasText(address.getStreet())
-                ? (String.format("%sул %s", StringUtils.hasText(value) ? ", " : "", address.getStreet()))
-                : "";
-        value += StringUtils.hasText(address.getHouse())
-                ? (String.format("%sд %s", StringUtils.hasText(value) ? ", " : "", address.getHouse()))
-                : "";
-        return value;
-    }
-
-    public List<String> getAddressesAsStingList(List<Address> addresses) {
-        return addresses
-                .stream()
-                .map(this::getAddressValue)
-                .collect(Collectors.toList());
+    public List<Address> getAllAddresses() {
+        return addressRepository.findAll();
     }
 
     public List<Address> getAddresses(String region, String city, String settlement, String street) {
@@ -80,7 +57,7 @@ public class AddressesUtils {
         return entityes;
     }
 
-    public List<Address> getAddresses(Address address) {
+    public Optional<Address> getAddresses(Address address) {
         return addressRepository.findByPostalcodeAndRegionAndCityAndSettlementAndStreetAndHouse(
                 address.getPostalcode(), address.getRegion(), address.getCity(),
                 address.getSettlement(), address.getStreet(), address.getHouse());
@@ -106,29 +83,46 @@ public class AddressesUtils {
     public List<Address> getUpdatedRelatedAddressesList(Request request, List<Address> addresses) {
         List<Address> persistedAddresses = addresses.stream()
                 .map(this::getAddresses)
-                .flatMap(Collection::stream)
-                .filter(Objects::nonNull)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
-
         List<Address> persistAddressesToRemove = persistedAddresses.stream()
                 .filter(a -> a.getRequests().stream().anyMatch(r -> r.getId() == request.getId())
                         && a.getRequests().size() == 1)
                 .collect(Collectors.toList());
+        addressRepository.deleteAll(persistAddressesToRemove);
         List<Address> persistAddressesWithChild = persistedAddresses.stream()
                 .filter(a -> a.getRequests().size() > 1)
                 .collect(Collectors.toList());
-
-        addressRepository.deleteAll(persistAddressesToRemove);
-
         persistAddressesWithChild.forEach(a -> a.getRequests().remove(request));
         addressRepository.saveAll(persistAddressesWithChild);
-
         for (Address persistedAddress :
                 persistedAddresses) {
             addresses.removeIf(a -> equalsAddresses(a, persistedAddress));
         }
-
         addresses.addAll(persistedAddresses);
+//        if (request.getId() != null) {
+//            Request persistRequest = requestRepository
+//                    .findById(request.getId())
+//                    .orElse(new Request(request.getQuery()));
+//            List<Address> persistedAddressesInRequest = persistRequest
+//                    .getAddresses()
+//                    .stream()
+//                    .filter(Objects::nonNull)
+//                    .collect(Collectors.toList());
+//            persistedAddressesInRequest
+//                    .forEach(a -> a.getRequests().remove(persistRequest));
+//            addressRepository.saveAll(persistedAddressesInRequest);
+//            List<Address> persistAddressesToRemove = persistedAddressesInRequest.stream()
+//                    .filter(a -> a.getRequests().size() == 0)
+//                    .collect(Collectors.toList());
+//            addressRepository.deleteAll(persistAddressesToRemove);
+//        }
+//
+//        for (Address address : addresses) {
+//            addressesUtils.getAddresses(address)
+//                    .ifPresent(value -> address.setId(value.getId()));
+//        }
         return addresses;
     }
 

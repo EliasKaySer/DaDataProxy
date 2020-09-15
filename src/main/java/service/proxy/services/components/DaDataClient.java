@@ -1,11 +1,13 @@
 package service.proxy.services.components;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-import service.proxy.models.transports.AddressDataDto;
+import service.proxy.models.converters.AddressMaper;
+import service.proxy.models.entityes.Address;
 import service.proxy.models.transports.AddressListDto;
 
 import java.util.Collections;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class DaDataClient {
     @Value("${dadata.apiKey}")
     private String apiKey;
@@ -22,6 +25,7 @@ public class DaDataClient {
     private String secretKey;
     @Value("${dadata.baseUri}")
     private String baseUri;
+
     private static final String DADATA_SUGGEST_BASE_URI = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest";
     private static final String DADATA_ADDRESS_URI = "/address";
     private static final String SUGGEST_LANGUAGE_DEFAULT = "ru";
@@ -29,11 +33,13 @@ public class DaDataClient {
     private static final Integer SUGGEST_COUNT_DEFAULT = 10;
     private static final Integer SUGGEST_COUNT_MAX = 20;
 
-    public List<AddressDataDto> getAddresses(String query, Integer count, String language) {
+    private final AddressMaper addressMaper;
+
+    public List<Address> getAddresses(String query, Integer count, String language) {
         return doRequest(query, count, language)
                 .getSuggestions()
                 .stream()
-                .map(a -> a.getData())
+                .map(a -> addressMaper.toEntity(a.getData()))
                 .collect(Collectors.toList());
     }
 

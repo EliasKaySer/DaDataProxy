@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import service.proxy.models.entityes.Address;
 import service.proxy.models.entityes.Request;
-import service.proxy.repositories.AddressRepository;
 import service.proxy.repositories.RequestRepository;
 
 import java.time.Duration;
@@ -19,10 +18,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class RequestsUtils {
-
     private final RequestRepository requestRepository;
-
-    private final AddressRepository addressRepository;
     private final AddressesUtils addressesUtils;
 
     @Transactional
@@ -32,11 +28,9 @@ public class RequestsUtils {
 
     @Transactional
     public Request updateRquest(Request request, List<Address> addresses) {
-        request.setCount(request.getCount() + 1);
-        request.setDate(Instant.now());
         request.setAddresses(addressesUtils.getUpdatedRelatedAddressesList(request, addresses));
         request.setResponses(request.getAddresses().size());
-        return requestRepository.save(request);
+        return updateRquest(request);
     }
 
     public Request updateRquest(Request request) {
@@ -51,6 +45,7 @@ public class RequestsUtils {
                 .getSeconds() >= 0;
     }
 
+    @Transactional
     public void RemoveObsoleteRequests(int responses, int months, int hours, int minutes, int seconds) {
         Instant instant = Instant.now().atZone(ZoneOffset.UTC)
                 .minusMonths(months).minusHours(hours).minusMinutes(minutes).minusMinutes(seconds)
@@ -61,8 +56,11 @@ public class RequestsUtils {
         if (requests.size() > 0) {
             List<UUID> requestsIds = requests.stream().map(Request::getId)
                     .collect(Collectors.toList());
-            List<Address> addresses = requests.stream().map(Request::getAddresses)
-                    .flatMap(Collection::stream).collect(Collectors.toList());
+            List<Address> addresses = requests.stream()
+                    .map(Request::getAddresses)
+                    .distinct()
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
             requestRepository.deleteAll(requests);
             addressesUtils.removeObsoleteAddresses(requestsIds, addresses);
         }

@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.transaction.annotation.Transactional;
 import service.proxy.controllers.AddressesController;
 import service.proxy.services.components.AddressesUtils;
 import service.proxy.services.components.DaDataClient;
@@ -57,27 +56,18 @@ public class CommonTest {
     }
 
     @Test
-    public void suggestVahtangova5A() throws Exception {
+    public void Vahtangova5A() throws Exception {
         testSuggestions(SampleSuggestions.NSK_VAHTANGOVA_5A);
-    }
-
-    @Test
-    public void suggestShluzovaia19() throws Exception {
-        testSuggestions(SampleSuggestions.NSK_SHLUZOVAIA_19);
-    }
-
-    @Test
-    public void addressVahtangova5A() throws Exception {
         testAddresses(SampleAddresses.NSK_VAHTANGOVA_5A);
     }
 
     @Test
-    public void addressShluzovaia19() throws Exception {
+    public void Shluzovaia19() throws Exception {
+        testSuggestions(SampleSuggestions.NSK_SHLUZOVAIA_19);
         testAddresses(SampleAddresses.NSK_SHLUZOVAIA_19);
     }
 
     @Test
-    @Transactional
     public void clean() throws Exception {
         requestsUtils.RemoveObsoleteRequests(0, 0, 0, 0, 0);
     }

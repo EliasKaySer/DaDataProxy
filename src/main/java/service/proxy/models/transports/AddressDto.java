@@ -3,6 +3,8 @@ package service.proxy.models.transports;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.util.StringUtils;
+import service.proxy.models.entityes.Address;
 
 @ApiModel(
         value = "Адрес",
@@ -16,11 +18,23 @@ public class AddressDto {
     @ApiModelProperty(value = "Данные адреса")
     private AddressDataDto data = new AddressDataDto();
 
-    public AddressDto() {
-    }
-
-    public AddressDto(String value, AddressDataDto data) {
-        this.value = value;
-        this.data = data;
+    public String setValue() {
+        String value = StringUtils.hasText(this.data.getPostal_code()) ? this.data.getPostal_code() : "";
+        value += StringUtils.hasText(this.data.getRegion())
+                ? (String.format("%s%s", StringUtils.hasText(value) ? ", " : "", this.data.getRegion()))
+                : "";
+        value += StringUtils.hasText(this.data.getCity())
+                ? (String.format("%sг %s", StringUtils.hasText(value) ? ", " : "", this.data.getCity()))
+                : "";
+        value += StringUtils.hasText(this.data.getSettlement())
+                ? (String.format("%s%s", StringUtils.hasText(value) ? ", " : "", this.data.getSettlement()))
+                : "";
+        value += StringUtils.hasText(this.data.getStreet())
+                ? (String.format("%sул %s", StringUtils.hasText(value) ? ", " : "", this.data.getStreet()))
+                : "";
+        value += StringUtils.hasText(this.data.getHouse())
+                ? (String.format("%sд %s", StringUtils.hasText(value) ? ", " : "", this.data.getHouse()))
+                : "";
+        return value;
     }
 }

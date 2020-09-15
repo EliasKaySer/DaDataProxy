@@ -5,13 +5,11 @@ import org.springframework.stereotype.Repository;
 import service.proxy.models.entityes.Address;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface AddressRepository extends CrudRepository<Address, UUID> {
-
-//    List<Address> findAllByValue(String value);
 
     List<Address> findAll();
 
@@ -23,7 +21,7 @@ public interface AddressRepository extends CrudRepository<Address, UUID> {
 
     List<Address> findAllByStreetLikeIgnoreCase(String street);
 
-    List<Address> findByPostalcodeAndRegionAndCityAndSettlementAndStreetAndHouse(String postalcode, String region, String city, String settlement, String street, String house);
+    Optional<Address> findByPostalcodeAndRegionAndCityAndSettlementAndStreetAndHouse(String postalcode, String region, String city, String settlement, String street, String house);
 
 }
 
