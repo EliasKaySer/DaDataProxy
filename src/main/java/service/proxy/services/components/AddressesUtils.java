@@ -8,7 +8,10 @@ import service.proxy.models.entityes.Address;
 import service.proxy.models.entityes.Request;
 import service.proxy.repositories.AddressRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -101,28 +104,6 @@ public class AddressesUtils {
             addresses.removeIf(a -> equalsAddresses(a, persistedAddress));
         }
         addresses.addAll(persistedAddresses);
-//        if (request.getId() != null) {
-//            Request persistRequest = requestRepository
-//                    .findById(request.getId())
-//                    .orElse(new Request(request.getQuery()));
-//            List<Address> persistedAddressesInRequest = persistRequest
-//                    .getAddresses()
-//                    .stream()
-//                    .filter(Objects::nonNull)
-//                    .collect(Collectors.toList());
-//            persistedAddressesInRequest
-//                    .forEach(a -> a.getRequests().remove(persistRequest));
-//            addressRepository.saveAll(persistedAddressesInRequest);
-//            List<Address> persistAddressesToRemove = persistedAddressesInRequest.stream()
-//                    .filter(a -> a.getRequests().size() == 0)
-//                    .collect(Collectors.toList());
-//            addressRepository.deleteAll(persistAddressesToRemove);
-//        }
-//
-//        for (Address address : addresses) {
-//            addressesUtils.getAddresses(address)
-//                    .ifPresent(value -> address.setId(value.getId()));
-//        }
         return addresses;
     }
 

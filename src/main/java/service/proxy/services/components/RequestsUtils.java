@@ -10,7 +10,7 @@ import service.proxy.repositories.RequestRepository;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,16 +53,14 @@ public class RequestsUtils {
         List<Request> requests = responses > 0
                 ? requestRepository.findByDateBeforeAndResponsesLessThan(instant, responses)
                 : requestRepository.findByDateBeforeAndResponsesGreaterThanEqual(instant, responses);
-        if (requests.size() > 0) {
-            List<UUID> requestsIds = requests.stream().map(Request::getId)
-                    .collect(Collectors.toList());
-            List<Address> addresses = requests.stream()
-                    .map(Request::getAddresses)
-                    .distinct()
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
-            requestRepository.deleteAll(requests);
-            addressesUtils.removeObsoleteAddresses(requestsIds, addresses);
+        List<UUID> requestsIds = new ArrayList<>();
+        List<Address> addresses = new ArrayList<>();
+        for (Request request : requests) {
+            requestsIds.add(request.getId());
+            addresses.addAll(request.getAddresses());
+            requestRepository.delete(request);
         }
+        addressesUtils.removeObsoleteAddresses(
+                requestsIds, addresses.stream().distinct().collect(Collectors.toList()));
     }
 }

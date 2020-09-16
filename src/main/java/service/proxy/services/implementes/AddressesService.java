@@ -51,7 +51,7 @@ public class AddressesService implements AddressInterface {
 
     @Override
     public List<Address> getSuggestions(String query) {
-        return getSuggestions(query, null, null);
+        return this.getSuggestions(query, null, null);
     }
 
     @Override

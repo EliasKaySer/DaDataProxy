@@ -1,11 +1,15 @@
 package service.proxy.IntegrationTests;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import service.proxy.controllers.AddressesController;
 import service.proxy.services.components.AddressesUtils;
 import service.proxy.services.components.DaDataClient;
@@ -18,6 +22,7 @@ import static service.proxy.IntegrationTests.TestCasesAddresses.addressesTest;
 import static service.proxy.IntegrationTests.TestCasesSuggestions.SampleSuggestions;
 import static service.proxy.IntegrationTests.TestCasesSuggestions.suggestionsTest;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CommonTest {
 
@@ -43,6 +48,7 @@ public class CommonTest {
     private AddressesService addressesService;
 
     @Test
+    @Order(1)
     public void NotNullServiceAndComponents() throws Exception {
         assertThat(addressesService).isNotNull();
         assertThat(requestsUtils).isNotNull();
@@ -51,25 +57,41 @@ public class CommonTest {
     }
 
     @Test
+    @Order(1)
     public void NotNullController() throws Exception {
         assertThat(addressesController).isNotNull();
     }
 
     @Test
-    public void Vahtangova5A() throws Exception {
+    @Order(2)
+    public void suggestVahtangova5A() throws Exception {
         testSuggestions(SampleSuggestions.NSK_VAHTANGOVA_5A);
+    }
+
+    @Test
+    @Order(2)
+    public void suggestShluzovaia19() throws Exception {
+        testSuggestions(SampleSuggestions.NSK_SHLUZOVAIA_19);
+    }
+
+    @Test
+    @Order(3)
+    public void addressVahtangova5A() throws Exception {
         testAddresses(SampleAddresses.NSK_VAHTANGOVA_5A);
     }
 
     @Test
-    public void Shluzovaia19() throws Exception {
-        testSuggestions(SampleSuggestions.NSK_SHLUZOVAIA_19);
+    @Order(3)
+    public void addressShluzovaia19() throws Exception {
         testAddresses(SampleAddresses.NSK_SHLUZOVAIA_19);
     }
 
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
+    @Order(4)
     public void clean() throws Exception {
-        requestsUtils.RemoveObsoleteRequests(0, 0, 0, 0, 0);
+        Thread.sleep(1000L);
+        requestsUtils.RemoveObsoleteRequests(2, 0, 0, 0, 0);
     }
 
     private void testSuggestions(final SampleSuggestions sample) {

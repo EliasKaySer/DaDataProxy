@@ -41,7 +41,7 @@ requests:
   removal:
     cron: 0 0 22 * * ?
     responses: 3
-    months: 0
+    months: 1
     hours: 0
     minutes: 0
     seconds: 0
