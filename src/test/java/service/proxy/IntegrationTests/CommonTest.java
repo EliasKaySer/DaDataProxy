@@ -66,6 +66,7 @@ public class CommonTest {
     @Order(2)
     public void suggestVahtangova5A() throws Exception {
         testSuggestions(SampleSuggestions.NSK_VAHTANGOVA_5A);
+        testAddresses(SampleAddresses.NSK_VAHTANGOVA_5A);
     }
 
     @Test
