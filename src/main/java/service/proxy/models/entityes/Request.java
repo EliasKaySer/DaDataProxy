@@ -42,11 +42,4 @@ public class Request {
             joinColumns = @JoinColumn(name = "request_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "address_id", referencedColumnName = "id"))
     private List<Address> addresses = new ArrayList<>();
-
-    public Request() {
-    }
-
-    public Request(String query) {
-        this.query = query;
-    }
 }

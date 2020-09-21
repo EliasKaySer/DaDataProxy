@@ -1,0 +1,5 @@
+TRUNCATE TABLE requests_addresses CASCADE;
+
+TRUNCATE TABLE requests CASCADE;
+
+TRUNCATE TABLE addresses CASCADE;

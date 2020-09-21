@@ -27,6 +27,7 @@ public class DaDataClient {
     private String baseUri;
 
     private static final String DADATA_SUGGEST_BASE_URI = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest";
+    private static final String DADATA_CLEAN_BASE_URI = "https://cleaner.dadata.ru/api/v1/clean";
     private static final String DADATA_ADDRESS_URI = "/address";
     private static final String SUGGEST_LANGUAGE_DEFAULT = "ru";
     private static final Integer SUGGEST_COUNT_MIN = 1;

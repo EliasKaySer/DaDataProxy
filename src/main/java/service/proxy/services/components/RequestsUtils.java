@@ -3,6 +3,7 @@ package service.proxy.services.components;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import service.proxy.models.converters.RequestMaper;
 import service.proxy.models.entityes.Address;
 import service.proxy.models.entityes.Request;
 import service.proxy.repositories.RequestRepository;
@@ -21,9 +22,11 @@ public class RequestsUtils {
     private final RequestRepository requestRepository;
     private final AddressesUtils addressesUtils;
 
+    private final RequestMaper requestMaper;
+
     @Transactional
     public Request getRquestByQuery(String query) {
-        return requestRepository.findByQuery(query).orElse(new Request(query));
+        return requestRepository.findByQuery(query).orElse(requestMaper.newEntity(query));
     }
 
     @Transactional
@@ -39,14 +42,14 @@ public class RequestsUtils {
         return requestRepository.save(request);
     }
 
-    public boolean IsObsoleteByTime(Request request, int hours, int minutes, int second) {
+    public boolean isObsoleteByTime(Request request, int hours, int minutes, int second) {
         return Duration.between(request.getDate(), Instant.now())
                 .minusHours(hours).minusMinutes(minutes).minusSeconds(second)
                 .getSeconds() >= 0;
     }
 
     @Transactional
-    public void RemoveObsoleteRequests(int responses, int months, int hours, int minutes, int seconds) {
+    public void removeObsoleteRequests(int responses, int months, int hours, int minutes, int seconds) {
         Instant instant = Instant.now().atZone(ZoneOffset.UTC)
                 .minusMonths(months).minusHours(hours).minusMinutes(minutes).minusMinutes(seconds)
                 .toInstant();

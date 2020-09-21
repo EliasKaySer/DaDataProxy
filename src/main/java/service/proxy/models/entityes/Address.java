@@ -50,7 +50,4 @@ public class Address {
     @ApiModelProperty(value = "Связанные запросы")
     @ManyToMany(mappedBy = "addresses", fetch = FetchType.LAZY)
     private List<Request> requests = new ArrayList<>();
-
-    public Address() {
-    }
 }

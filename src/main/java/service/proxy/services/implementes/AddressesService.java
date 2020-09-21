@@ -61,7 +61,7 @@ public class AddressesService implements AddressInterface {
         }
         Request request = requestsUtils.getRquestByQuery(query);
         if (request.getId() == null
-                || requestsUtils.IsObsoleteByTime(request, obsoleteHours, obsoleteMinutes, obsoleteSeconds)) {
+                || requestsUtils.isObsoleteByTime(request, obsoleteHours, obsoleteMinutes, obsoleteSeconds)) {
             List<Address> addresses = daDataClient.getAddresses(query, count, language);
             request = requestsUtils.updateRquest(request, addresses);
         } else {
@@ -72,7 +72,7 @@ public class AddressesService implements AddressInterface {
 
     @Override
     public void clean() {
-        requestsUtils.RemoveObsoleteRequests(
+        requestsUtils.removeObsoleteRequests(
                 removalResponses, removalMonths, removalHours, removalMinutes, removalSeconds);
     }
 }

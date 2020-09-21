@@ -16,10 +16,10 @@ spring:
     enabled: true
     validateOnMigrate: true
     createSchemas: false
-    url: jdbc:postgresql://192.168.0.182:5432/proxy_db
+#    url: jdbc:postgresql://192.168.0.182:5432/proxy_db
     schemas: proxy
-    user: proxy
-    password: Uu6c34sDtnjfjC0ai1Lpm8gB
+#    user: proxy
+#    password: Uu6c34sDtnjfjC0ai1Lpm8gB
     locations:
       classpath:db/migrations
     baselineOnMigrate: false
@@ -30,7 +30,8 @@ swagger.host:
 # dummy values to keep the placeholder substitution in tests happy
 dadata:
   apiKey: 1cbdf85ba01c9eb14c325d82a0603b312e41e804
-  secretKey: 5f85770575e3e11fe7658defbba3496c875a64bc
+  secretKey: 0000000000000000000000000000000000000000
+#  secretKey: 5f85770575e3e11fe7658defbba3496c875a64bc
   baseUri: https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest
 
 requests:

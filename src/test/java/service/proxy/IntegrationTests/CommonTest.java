@@ -1,39 +1,45 @@
 package service.proxy.IntegrationTests;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import service.proxy.controllers.AddressesController;
+import service.proxy.repositories.RequestRepository;
 import service.proxy.services.components.AddressesUtils;
 import service.proxy.services.components.DaDataClient;
 import service.proxy.services.components.RequestsUtils;
 import service.proxy.services.implementes.AddressesService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static service.proxy.IntegrationTests.TestCaseFillDatabase.SampleData;
+import static service.proxy.IntegrationTests.TestCaseFillDatabase.fillData;
 import static service.proxy.IntegrationTests.TestCasesAddresses.SampleAddresses;
 import static service.proxy.IntegrationTests.TestCasesAddresses.addressesTest;
 import static service.proxy.IntegrationTests.TestCasesSuggestions.SampleSuggestions;
 import static service.proxy.IntegrationTests.TestCasesSuggestions.suggestionsTest;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@RequiredArgsConstructor
 public class CommonTest {
 
     @LocalServerPort
     private int port;
 
     @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
     private AddressesController addressesController;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private AddressesService addressesService;
 
     @Autowired
     private RequestsUtils requestsUtils;
@@ -45,53 +51,51 @@ public class CommonTest {
     private DaDataClient daDataClient;
 
     @Autowired
-    private AddressesService addressesService;
+    public RequestRepository requestRepository;
 
     @Test
-    @Order(1)
-    public void NotNullServiceAndComponents() throws Exception {
+    public void NotNullClasses() {
+        assertThat(addressesController).isNotNull();
         assertThat(addressesService).isNotNull();
         assertThat(requestsUtils).isNotNull();
         assertThat(addressesUtils).isNotNull();
         assertThat(daDataClient).isNotNull();
+        assertThat(requestRepository).isNotNull();
     }
 
     @Test
-    @Order(1)
-    public void NotNullController() throws Exception {
-        assertThat(addressesController).isNotNull();
-    }
-
-    @Test
-    @Order(2)
-    public void suggestVahtangova5A() throws Exception {
+    public void suggestVahtangova5A() {
         testSuggestions(SampleSuggestions.NSK_VAHTANGOVA_5A);
     }
 
     @Test
-    @Order(2)
-    public void suggestShluzovaia19() throws Exception {
+    public void suggestShluzovaia19() {
         testSuggestions(SampleSuggestions.NSK_SHLUZOVAIA_19);
     }
 
     @Test
-    @Order(3)
-    public void addressVahtangova5A() throws Exception {
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = "classpath:db/migrations/truncateTables.sql")
+    public void addressVahtangova5A() {
+        fillData(requestRepository, SampleData.NSK_VAHTANGOVA_5A);
         testAddresses(SampleAddresses.NSK_VAHTANGOVA_5A);
     }
 
     @Test
-    @Order(3)
-    public void addressShluzovaia19() throws Exception {
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = "classpath:db/migrations/truncateTables.sql")
+    public void addressShluzovaia19() {
+        fillData(requestRepository, SampleData.NSK_SHLUZOVAIA_19);
         testAddresses(SampleAddresses.NSK_SHLUZOVAIA_19);
     }
 
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    @Order(4)
-    public void clean() throws Exception {
-        Thread.sleep(1000L);
-        requestsUtils.RemoveObsoleteRequests(2, 0, 0, 0, 0);
+    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+            scripts = "classpath:db/migrations/truncateTables.sql")
+    public void clean() {
+        fillData(requestRepository, SampleData.NSK_VAHTANGOVA_5A);
+        fillData(requestRepository, SampleData.NSK_SHLUZOVAIA_19);
+        requestsUtils.removeObsoleteRequests(2, 0, 0, 0, 0);
     }
 
     private void testSuggestions(final SampleSuggestions sample) {
@@ -104,3 +108,4 @@ public class CommonTest {
                 sample.getRequest(), sample.getResponse());
     }
 }
+

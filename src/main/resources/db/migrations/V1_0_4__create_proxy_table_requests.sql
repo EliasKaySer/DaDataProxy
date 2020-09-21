@@ -6,7 +6,7 @@ create table requests
     count     integer                  not null default 0,
     date      timestamp with time zone not null,
     query     varchar(255)             not null
-        constraint requests_query_uk
+        constraint requests__query__ui
             unique,
     responses integer                  not null
 );

@@ -1,9 +1,11 @@
 package service.proxy.IntegrationTests;
 
+import lombok.extern.java.Log;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Log(topic = "TestCasesAddressesLog")
 public class TestCasesAddresses {
 
     public enum SampleAddresses {
@@ -31,13 +33,20 @@ public class TestCasesAddresses {
 
     public static void addressesTest(TestRestTemplate restTemplate, int port, String request, String response) {
 
-        System.out.println("request: " + request);
+        log.info("request:\n" + request);
 
         String uri = String.format("http://localhost:%s/api/v1/address/find?%s", port, request);
 
         String responseBody = restTemplate.postForObject(uri, null, String.class);
 
-        System.out.println("responseBody: " + responseBody);
+        log.info("responseBody:"
+                + "\nbody:\n" + responseBody
+                + "\nhash:\n" + responseBody.hashCode()
+        );
+        log.info("response:"
+                + "\nbody:\n" + response
+                + "\nhash:\n" + response.hashCode()
+        );
 
         assertThat(responseBody.hashCode()).isEqualTo(response.hashCode());
     }

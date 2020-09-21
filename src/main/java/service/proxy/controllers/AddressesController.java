@@ -47,7 +47,7 @@ public class AddressesController {
             notes = "Возвращается список адресов из БД"
     )
     @RequestMapping(value = "/find", method = RequestMethod.POST)
-    private @ResponseBody
+    public @ResponseBody
     List<AddressDto> getAddresses(
             @ApiParam(value = "Регион", defaultValue = "", type = "String",
                     example = "") @RequestParam(required = false) String region,
@@ -78,7 +78,7 @@ public class AddressesController {
             @ApiResponse(code = 500, message = "Произошла внутренняя ошибка сервиса"),
     })
     @RequestMapping(value = "/{query}", method = RequestMethod.GET)
-    private @ResponseBody
+    public @ResponseBody
     List<String> getSuggestions(
             @ApiParam(value = "Текст запроса", defaultValue = "", type = "String",
                     example = "630058 Новосибирск Вахтангова 5") @PathVariable(required = true) String query
@@ -104,7 +104,7 @@ public class AddressesController {
             @ApiResponse(code = 500, message = "Произошла внутренняя ошибка сервиса"),
     })
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    private @ResponseBody
+    public @ResponseBody
     List<String> getSuggestions(
             @ApiParam(value = "Текст запроса", defaultValue = "", type = "String",
                     example = "630058 Новосибирск Вахтангова 5") @RequestParam(required = true) String query,

@@ -1,7 +1,6 @@
 package service.proxy.services.interfaces;
 
 import service.proxy.models.entityes.Address;
-import service.proxy.models.transports.AddressDto;
 
 import java.util.List;
 
